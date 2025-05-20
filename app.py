@@ -1,5 +1,4 @@
-# app.py
-from flask import Flask, render_template, request, redirect, url_for, send_from_directory
+from flask import Flask, render_template, request, redirect, url_for
 import os
 import cv2
 import numpy as np
@@ -20,37 +19,54 @@ def index():
 def upload():
     file = request.files['image']
     if file:
-        # Save original
         filename = secure_filename(file.filename)
-        filepath = os.path.join('static/uploads', filename)
+        filepath = os.path.join(UPLOAD_FOLDER, filename)
         file.save(filepath)
 
-        # Process the image
-        result_path = process_image(filepath,filename)
+        # Process image
+        result_path = process_image(filepath, filename)
 
-        # Show both images on the same page
         return render_template(
             'index.html',
-            original_image=url_for('static', filename='uploads/' + filename),
-            processed_image=url_for('static', filename='results/' + os.path.basename(result_path))
+            original_image=url_for('static', filename=f'uploads/{filename}'),
+            processed_image=url_for('static', filename=f'results/{os.path.basename(result_path)}')
         )
-    else:
-        return redirect(url_for('index'))
+    return redirect(url_for('index'))
 
 def process_image(filepath, filename):
+    # Load & Resize
     image = cv2.imread(filepath)
     resized = cv2.resize(image, (512, 512))
     gray = cv2.cvtColor(resized, cv2.COLOR_BGR2GRAY)
 
-    _, thresh = cv2.threshold(gray, 150, 255, cv2.THRESH_BINARY_INV)
+    # Blur to reduce noise
+    blurred = cv2.GaussianBlur(gray, (5, 5), 0)
 
+    # Adaptive Thresholding
+    adaptive_thresh = cv2.adaptiveThreshold(
+        blurred, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C,
+        cv2.THRESH_BINARY_INV, 11, 2
+    )
+
+    # Edge detection (Canny)
+    edges = cv2.Canny(blurred, 50, 150)
+
+    # Morphology to close gaps and emphasize structures
     kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (3, 3))
-    gradient = cv2.morphologyEx(thresh, cv2.MORPH_GRADIENT, kernel)
-    closed = cv2.morphologyEx(gradient, cv2.MORPH_CLOSE, kernel, iterations=2)
-    opened = cv2.morphologyEx(closed, cv2.MORPH_OPEN, kernel, iterations=1)
+    dilated = cv2.dilate(edges, kernel, iterations=2)
 
+    # Contour detection and filtering
+    contours, _ = cv2.findContours(dilated, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+    contour_image = resized.copy()
+    for cnt in contours:
+        area = cv2.contourArea(cnt)
+        if area > 300:  # Filter noise
+            cv2.drawContours(contour_image, [cnt], -1, (0, 255, 0), 2)
+
+    # Save result
     result_path = os.path.join(RESULT_FOLDER, f'processed_{filename}')
-    cv2.imwrite(result_path, opened)
+    cv2.imwrite(result_path, contour_image)
+
     return result_path
 
 if __name__ == '__main__':
