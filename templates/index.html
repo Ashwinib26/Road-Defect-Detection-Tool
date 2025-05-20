@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Road Defect Detection</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+  <div class="container">
+    <h1>🚧 Road Defect Detection</h1>
+
+    <form action="/upload" method="POST" enctype="multipart/form-data">
+      <label for="image">Upload Road Image:</label><br>
+      <input type="file" name="image" id="image" required><br><br>
+      <button type="submit">Detect Defects</button>
+    </form>
+
+    {% if original_image and processed_image %}
+    <div class="image-pair">
+      <div>
+        <h3>Original Image</h3>
+        <img src="{{ original_image }}" alt="Original Image" class="img-display">
+      </div>
+      <div>
+        <h3>Processed Image (Cracks Highlighted)</h3>
+        <img src="{{ processed_image }}" alt="Processed Image" class="img-display">
+      </div>
+    </div>
+    {% endif %}
+  </div>
+</body>
+</html>

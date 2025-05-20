@@ -1,43 +1,57 @@
+# app.py
+from flask import Flask, render_template, request, redirect, url_for, send_from_directory
+import os
 import cv2
 import numpy as np
-import os
-import matplotlib.pyplot as plt
+from werkzeug.utils import secure_filename
 
-# Load image
-image = cv2.imread('images/road_sample.jpg')
-resized = cv2.resize(image, (512, 512))
-gray = cv2.cvtColor(resized, cv2.COLOR_BGR2GRAY)
+app = Flask(__name__)
+UPLOAD_FOLDER = 'static/uploads'
+RESULT_FOLDER = 'static/results'
 
-# Apply thresholding
-_, thresh = cv2.threshold(gray, 150, 255, cv2.THRESH_BINARY_INV)
+os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+os.makedirs(RESULT_FOLDER, exist_ok=True)
 
-# Morphological Gradient to highlight cracks
-kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (3, 3))
-gradient = cv2.morphologyEx(thresh, cv2.MORPH_GRADIENT, kernel)
+@app.route('/')
+def index():
+    return render_template('index.html', original_image=None, processed_image=None)
 
-# Closing to fill gaps and shadows
-closed = cv2.morphologyEx(gradient, cv2.MORPH_CLOSE, kernel, iterations=2)
+@app.route('/upload', methods=['POST'])
+def upload():
+    file = request.files['image']
+    if file:
+        # Save original
+        filename = secure_filename(file.filename)
+        filepath = os.path.join('static/uploads', filename)
+        file.save(filepath)
 
-# Optional Opening to remove small debris
-opened = cv2.morphologyEx(closed, cv2.MORPH_OPEN, kernel, iterations=1)
+        # Process the image
+        result_path = process_image(filepath,filename)
 
-# Save results
-os.makedirs("results", exist_ok=True)
-cv2.imwrite("results/gray.jpg", gray)
-cv2.imwrite("results/thresh.jpg", thresh)
-cv2.imwrite("results/gradient.jpg", gradient)
-cv2.imwrite("results/closed.jpg", closed)
-cv2.imwrite("results/opened.jpg", opened)
+        # Show both images on the same page
+        return render_template(
+            'index.html',
+            original_image=url_for('static', filename='uploads/' + filename),
+            processed_image=url_for('static', filename='results/' + os.path.basename(result_path))
+        )
+    else:
+        return redirect(url_for('index'))
 
-# Show comparison
-titles = ["Gray", "Threshold", "Gradient", "Closed", "Opened"]
-images = [gray, thresh, gradient, closed, opened]
+def process_image(filepath, filename):
+    image = cv2.imread(filepath)
+    resized = cv2.resize(image, (512, 512))
+    gray = cv2.cvtColor(resized, cv2.COLOR_BGR2GRAY)
 
-plt.figure(figsize=(12, 6))
-for i in range(len(images)):
-    plt.subplot(2, 3, i+1)
-    plt.imshow(images[i], cmap='gray')
-    plt.title(titles[i])
-    plt.axis('off')
-plt.tight_layout()
-plt.show()
+    _, thresh = cv2.threshold(gray, 150, 255, cv2.THRESH_BINARY_INV)
+
+    kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (3, 3))
+    gradient = cv2.morphologyEx(thresh, cv2.MORPH_GRADIENT, kernel)
+    closed = cv2.morphologyEx(gradient, cv2.MORPH_CLOSE, kernel, iterations=2)
+    opened = cv2.morphologyEx(closed, cv2.MORPH_OPEN, kernel, iterations=1)
+
+    result_path = os.path.join(RESULT_FOLDER, f'processed_{filename}')
+    cv2.imwrite(result_path, opened)
+    return result_path
+
+if __name__ == '__main__':
+    app.run(debug=True)
