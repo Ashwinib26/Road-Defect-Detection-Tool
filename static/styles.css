@@ -1,0 +1,78 @@
+/* General Page Styling */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f0f2f5;
+    margin: 0;
+    padding: 0;
+}
+
+.container {
+    max-width: 900px;
+    margin: 40px auto;
+    background-color: #fff;
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    text-align: center;
+}
+
+h1 {
+    color: #333;
+    margin-bottom: 20px;
+}
+
+form {
+    margin-bottom: 25px;
+}
+
+input[type="file"] {
+    margin-top: 10px;
+    padding: 10px;
+    border: 2px dashed #aaa;
+    border-radius: 8px;
+    width: 70%;
+    background-color: #fafafa;
+    cursor: pointer;
+    transition: border 0.3s ease;
+}
+
+input[type="file"]:hover {
+    border-color: #007bff;
+}
+
+button {
+    margin-top: 20px;
+    padding: 10px 20px;
+    background-color: #007bff;
+    border: none;
+    color: white;
+    border-radius: 6px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background 0.3s ease;
+}
+
+button:hover {
+    background-color: #0056b3;
+}
+
+hr {
+    margin: 30px 0;
+    border: 0;
+    border-top: 1px solid #ddd;
+}
+
+/* Image Preview Styling */
+.processed-image {
+    max-width: 100%;
+    height: auto;
+    border-radius: 10px;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.15);
+    margin-top: 15px;
+}
+
+.footer-note {
+    font-size: 14px;
+    color: #666;
+    margin-top: 25px;
+}
