@@ -18,56 +18,66 @@ def index():
 @app.route('/upload', methods=['POST'])
 def upload():
     file = request.files['image']
+    min_area = int(request.form.get('min_area', 300))
+
     if file:
         filename = secure_filename(file.filename)
         filepath = os.path.join(UPLOAD_FOLDER, filename)
         file.save(filepath)
 
-        # Process image
-        result_path = process_image(filepath, filename)
+        result_path, stats = process_image(filepath, filename, min_area)
 
         return render_template(
             'index.html',
             original_image=url_for('static', filename=f'uploads/{filename}'),
-            processed_image=url_for('static', filename=f'results/{os.path.basename(result_path)}')
+            processed_image=url_for('static', filename=f'results/{os.path.basename(result_path)}'),
+            total_cracks=stats['count'],
+            total_area=stats['total_area'],
+            severity=stats['severity']
         )
     return redirect(url_for('index'))
 
-def process_image(filepath, filename):
-    # Load & Resize
+def process_image(filepath, filename, min_area):
     image = cv2.imread(filepath)
     resized = cv2.resize(image, (512, 512))
     gray = cv2.cvtColor(resized, cv2.COLOR_BGR2GRAY)
-
-    # Blur to reduce noise
     blurred = cv2.GaussianBlur(gray, (5, 5), 0)
-
-    # Adaptive Thresholding
-    adaptive_thresh = cv2.adaptiveThreshold(
-        blurred, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C,
-        cv2.THRESH_BINARY_INV, 11, 2
-    )
-
-    # Edge detection (Canny)
     edges = cv2.Canny(blurred, 50, 150)
 
-    # Morphology to close gaps and emphasize structures
     kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (3, 3))
     dilated = cv2.dilate(edges, kernel, iterations=2)
 
-    # Contour detection and filtering
     contours, _ = cv2.findContours(dilated, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
     contour_image = resized.copy()
+    count = 0
+    total_area = 0
+
     for cnt in contours:
         area = cv2.contourArea(cnt)
-        if area > 300:  # Filter noise
-            cv2.drawContours(contour_image, [cnt], -1, (0, 255, 0), 2)
+        if area > min_area:
+            count += 1
+            total_area += area
+            x, y, w, h = cv2.boundingRect(cnt)
+            cv2.rectangle(contour_image, (x, y), (x + w, y + h), (0, 255, 0), 2)
 
-    # Save result
+    # Severity based on total area
+    if total_area < 2000:
+        severity = "Low"
+    elif total_area < 6000:
+        severity = "Medium"
+    else:
+        severity = "High"
+
     result_path = os.path.join(RESULT_FOLDER, f'processed_{filename}')
     cv2.imwrite(result_path, contour_image)
 
-    return result_path
+    stats = {
+        'count': count,
+        'total_area': int(total_area),
+        'severity': severity
+    }
+
+    return result_path, stats
 
 if __name__ == '__main__':
     app.run(debug=True)
