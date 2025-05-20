@@ -3,6 +3,8 @@ import os
 import cv2
 import numpy as np
 from werkzeug.utils import secure_filename
+import uuid
+from time import time
 
 app = Flask(__name__)
 UPLOAD_FOLDER = 'static/uploads'
@@ -21,7 +23,8 @@ def upload():
     min_area = int(request.form.get('min_area', 300))
 
     if file:
-        filename = secure_filename(file.filename)
+        unique_id = str(uuid.uuid4())[:8]
+        filename = f'{unique_id}_{secure_filename(file.filename)}'
         filepath = os.path.join(UPLOAD_FOLDER, filename)
         file.save(filepath)
 
@@ -29,8 +32,8 @@ def upload():
 
         return render_template(
             'index.html',
-            original_image=url_for('static', filename=f'uploads/{filename}'),
-            processed_image=url_for('static', filename=f'results/{os.path.basename(result_path)}'),
+            original_image=url_for('static', filename=f'uploads/{filename}') + f'?t={int(time())}',
+            processed_image=url_for('static', filename=f'results/{os.path.basename(result_path)}') + f'?t={int(time())}',
             total_cracks=stats['count'],
             total_area=stats['total_area'],
             severity=stats['severity']
@@ -60,15 +63,15 @@ def process_image(filepath, filename, min_area):
             x, y, w, h = cv2.boundingRect(cnt)
             cv2.rectangle(contour_image, (x, y), (x + w, y + h), (0, 255, 0), 2)
 
-    # Severity based on total area
-    if total_area < 4000:
+    if total_area < 40000:
         severity = "Low"
-    elif total_area < 10000:
+    elif total_area < 80000:
         severity = "Medium"
     else:
         severity = "High"
 
-    result_path = os.path.join(RESULT_FOLDER, f'processed_{filename}')
+    result_filename = f'processed_{filename}'
+    result_path = os.path.join(RESULT_FOLDER, result_filename)
     cv2.imwrite(result_path, contour_image)
 
     stats = {
