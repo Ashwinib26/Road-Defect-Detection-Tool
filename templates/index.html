@@ -1,0 +1,51 @@
+@@ -0,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Road Crack Detection</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .container { display: flex; gap: 20px; }
+        img { max-width: 45%; height: auto; border: 1px solid #ccc; padding: 10px; }
+        .form-container, .output-container { flex: 1; }
+        label { display: block; margin-top: 10px; }
+    </style>
+</head>
+<body>
+    <h1>Road Crack Detection System</h1>
+    <form action="/upload" method="post" enctype="multipart/form-data">
+        <label>Select Image:</label>
+        <input type="file" name="image" required>
+
+        <label for="min_area">Min Crack Area (px): <span id="area_val">300</span></label>
+        <input type="range" id="min_area" name="min_area" min="100" max="1000" value="300" step="50" oninput="area_val.innerText = this.value">
+
+        <br><br>
+        <input type="submit" value="Upload & Detect">
+    </form>
+
+    {% if original_image %}
+    <div class="container">
+        <div class="form-container">
+            <h3>Original Image</h3>
+            <img src="{{ original_image }}">
+        </div>
+
+        <div class="form-container">
+            <h3>Processed Image</h3>
+            <img src="{{ processed_image }}">
+        </div>
+    </div>
+
+    <div class="output-container">
+        <h2>Detection Summary:</h2>
+        <ul>
+            <li><strong> Total Cracks Detected:</strong> {{ total_cracks }}</li>
+            <li><strong> Total Crack Area:</strong> {{ total_area }} px²</li>
+            <li><strong> Severity Level:</strong> {{ severity }}</li>
+        </ul>
+    </div>
+    {% endif %}
+</body>
+</html>
