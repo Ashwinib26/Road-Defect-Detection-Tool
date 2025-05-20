@@ -61,9 +61,9 @@ def process_image(filepath, filename, min_area):
             cv2.rectangle(contour_image, (x, y), (x + w, y + h), (0, 255, 0), 2)
 
     # Severity based on total area
-    if total_area < 2000:
+    if total_area < 4000:
         severity = "Low"
-    elif total_area < 6000:
+    elif total_area < 10000:
         severity = "Medium"
     else:
         severity = "High"
