@@ -70,24 +70,21 @@ form input[type="submit"]:hover {
 }
 
 button {
-            margin: 10px;
-            padding: 10px 20px;
-            border-radius: 6px;
-            border: none;
-            font-size: 16px;
-        }
+    margin: 10px;
+    padding: 10px 20px;
+    border-radius: 6px;
+    border: none;
+    font-size: 16px;
+    background-color: #dc3545;
+    color: white;
+    cursor: pointer;
+}
 
-        input[type="submit"] {
-            background-color: #007bff;
-            color: white;
-            cursor: pointer;
-        }
-
-        button {
-            background-color: #dc3545;
-            color: white;
-            cursor: pointer;
-        }
+input[type="submit"] {
+    background-color: #007bff;
+    color: white;
+    cursor: pointer;
+}
 
 /* Image Container */
 .container {
@@ -98,14 +95,55 @@ button {
     margin-bottom: 50px;
 }
 
+.container .form-container {
+    background: white;
+    padding: 20px;
+    border-radius: 16px;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: start;
+}
+
+.container .form-container:nth-child(1) {
+    width: 250px;
+    height: 320px;
+}
+
+.container .form-container:nth-child(2) {
+    width: 450px;
+    height: 420px;
+}
+
+.container .form-container img {
+    width: 100%;
+    height: 90%;
+    object-fit: contain;
+    border-radius: 10px;
+    border: 2px solid #e1e8f0;
+    background-color: #f9f9f9;
+}
+
+.container .form-container h3 {
+    color: #1f3c88;
+    margin-bottom: 10px;
+    text-align: center;
+}
+
+
 .image-card {
     background: white;
     padding: 20px;
     border-radius: 16px;
     box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
-    width: 45%;
-    min-width: 300px;
+    width: 300px;
+    height: 370px;
     transition: transform 0.2s;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: start;
 }
 
 .image-card:hover {
@@ -115,13 +153,16 @@ button {
 .image-card h3 {
     color: #1f3c88;
     margin-bottom: 10px;
+    text-align: center;
 }
 
 img {
-    max-width: 100%;
-    height: auto;
+    width: 100%;
+    height: 250px;
+    object-fit: contain;
     border-radius: 10px;
     border: 2px solid #e1e8f0;
+    background-color: #f9f9f9;
 }
 
 /* Output Section */

@@ -61,7 +61,7 @@ def process_image(filepath, filename, min_area):
             count += 1
             total_area += area
             x, y, w, h = cv2.boundingRect(cnt)
-            cv2.rectangle(contour_image, (x, y), (x + w, y + h), (0, 255, 0), 2)
+            cv2.rectangle(contour_image, (x, y), (x + w, y + h), (0, 0, 255), 2)
 
     if total_area < 40000:
         severity = "Low"
