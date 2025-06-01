@@ -9,7 +9,7 @@ A web-based application that enables users to upload road images and detect crac
 * **Backend**: Python, Flask
 * **Frontend**: HTML, CSS, JavaScript
 * **Image Processing**: OpenCV
-* **File Handling**: `werkzeug`, `uuid`, `os`, `cv2`
+* **File Handling**: `werkzeug`
 
 ---
 
@@ -37,10 +37,8 @@ road-crack-detection/
 
   * Original Image
   * Processed Image with detected crack regions highlighted
-  * Total number of detected cracks
-  * Total crack area in pixels
+  * Total number of detected cracks and total crack area in pixels
   * Severity level (`Low`, `Medium`, `High`)
-* Reset button to clear results and upload a new image.
 
 ---
 
@@ -74,32 +72,25 @@ python app.py
 
 Go to `http://127.0.0.1:5000` in your browser.
 
-* The **Reset** button reloads the page, allowing you to clear results and upload a new image.
-
 ---
 
 ### 📝 Future Improvements
 
 * Integrate deep learning (CNN) models for more accurate crack detection.
 * Export results as PDF report.
-* Support for batch image uploads.
 * Mobile responsiveness and drag-and-drop upload.
 
 ---
 
 ### 🤝 Contributing
 
-1. Fork the repo
-2. Create a new branch (`feature/my-feature`)
-3. Commit your changes
-4. Push to the branch
-5. Create a pull request
+Fork the repo make your changes , Create a pull request and participate.
 
 ---
 
 ### 🙋‍♀️ Support
 
-For questions or suggestions, open an [Issue](https://github.com/your-username/medical-image-preprocessor/issues) or contact [ashwinisbisen@gmail.com](mailto:ashwinisbisen@gmail.com).
+For questions or suggestions, open an [Issue] or contact [ashwinisbisen@gmail.com](mailto:ashwinisbisen@gmail.com).
 
 ---
 
@@ -109,3 +100,4 @@ For questions or suggestions, open an [Issue](https://github.com/your-username/m
 * [OpenCV Tutorials](https://docs.opencv.org/)
 
 ---
+## THANK YOU!!
